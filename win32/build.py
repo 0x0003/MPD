@@ -9,4 +9,4 @@ subprocess.check_call(
         os.path.join(os.path.dirname(__file__), 'configure.py'),
     ] + sys.argv[1:],
 )
-subprocess.check_call(['ninja'])
+subprocess.check_call(['ninja', '-j4'])

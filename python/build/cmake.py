@@ -77,6 +77,7 @@ def configure(toolchain: AnyToolchain, src: str, build: str, args: list[str]=[],
         '-DCMAKE_BUILD_TYPE=release',
 
         '-GNinja',
+        '-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
     ] + cross_args + args
 
     if toolchain.host_triplet is not None:
@@ -126,5 +127,5 @@ class CmakeProject(Project):
 
     def _build(self, toolchain: AnyToolchain) -> None:
         build = self.configure(toolchain)
-        subprocess.check_call(['ninja', '-v', 'install'],
+        subprocess.check_call(['ninja', '-v', '-j4', 'install'],
                               cwd=build, env=toolchain.env)
