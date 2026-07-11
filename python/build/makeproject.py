@@ -12,12 +12,7 @@ class MakeProject(Project):
         self.install_target = install_target
 
     def get_simultaneous_jobs(self) -> int:
-        try:
-            # use twice as many simultaneous jobs as we have CPU cores
-            return multiprocessing.cpu_count() * 2
-        except NotImplementedError:
-            # default to 12, if multiprocessing.cpu_count() is not implemented
-            return 12
+        return 4
 
     def get_make_args(self, toolchain: AnyToolchain) -> list[str]:
         return ['--quiet', '-j' + str(self.get_simultaneous_jobs())]

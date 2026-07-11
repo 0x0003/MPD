@@ -47,5 +47,5 @@ class FfmpegProject(Project):
             configure.append('--cpu=cortex-a8')
 
         subprocess.check_call(configure, cwd=build, env=toolchain.env)
-        subprocess.check_call(['/usr/bin/make', '--quiet', '-j12'], cwd=build, env=toolchain.env)
+        subprocess.check_call(['/usr/bin/make', '--quiet', '-j4'], cwd=build, env=toolchain.env)
         subprocess.check_call(['/usr/bin/make', '--quiet', 'install'], cwd=build, env=toolchain.env)
