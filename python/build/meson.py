@@ -73,10 +73,10 @@ needs_exe_wrapper = true
 
         f.write(f"""
 [built-in options]
-c_args = {repr((toolchain.cppflags + ' ' + toolchain.cflags).split())}
+c_args = {repr((toolchain.cppflags + ' ' + toolchain.cflags + ' -DNDEBUG').split())}
 c_link_args = {repr(toolchain.ldflags.split() + toolchain.libs.split())}
 
-cpp_args = {repr((toolchain.cppflags + ' ' + toolchain.cxxflags).split())}
+cpp_args = {repr((toolchain.cppflags + ' ' + toolchain.cxxflags + ' -DNDEBUG').split())}
 cpp_link_args = {repr(toolchain.ldflags.split() + toolchain.libs.split())}
 """)
 
