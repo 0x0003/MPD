@@ -149,7 +149,7 @@ struct Instance final
 	 * Wrapper for EventLoop::Break().  Call to initiate shutdown.
 	 */
 	void Break() noexcept {
-		event_loop.Break();
+		event_loop.InjectBreak();
 	}
 
 	/**
