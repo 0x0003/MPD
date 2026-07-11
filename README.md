@@ -1,29 +1,23 @@
-# Music Player Daemon
+## Original README [**HERE**](https://github.com/MusicPlayerDaemon/MPD)
 
-http://www.musicpd.org
+A personal fork that fixes a few Windows-specific issues in MPD:
+- Bumps libid3tag from 0.15.1b to 0.16.4
+- Fixes multi-value ID3v2.4 tags, e.g. multiple genres, not being read correctly due to ffmpeg's incomplete id3v2 parser (https://trac.ffmpeg.org/ticket/6949). Why does upstream MPD code properly process tags on Linux, but Windows requires a workaround? I have no idea.
 
-A daemon for playing music of various formats.  Music is played through the 
-server's audio device.  The daemon stores info about all available music, 
-and this info can be easily searched and retrieved.  Player control, info
-retrieval, and playlist management can all be managed remotely.
+## Building
 
-For basic installation instructions
-[read the manual](https://www.musicpd.org/doc/user/install.html).
+Cross-compile from Linux using the same approach as upstream:
+https://github.com/MusicPlayerDaemon/MPD/blob/master/doc/user.rst#compiling-for-windows
 
-# Users
+```sh
+pacman -S --needed mingw-w64-toolchain meson ninja cmake nasm pkg-config quilt gperf autoconf automake libtool
+```
 
-- [Manual](https://mpd.readthedocs.io/en/stable/user.html), or see `/usr/share/doc/mpd/html` in your installation
-- [Forum](https://github.com/MusicPlayerDaemon/MPD/discussions)
-- [IRC](ircs://irc.libera.chat:6697/#mpd)
-- [Bug tracker](https://github.com/MusicPlayerDaemon/MPD/issues/)
+```sh
+git clone --depth 1 https://github.com/0x0003/MPD
+cd MPD && mkdir -p output/win64 && cd output/win64
+../../win32/build.py --64 --buildtype=release -Dwrap_mode=forcefallback
+```
 
-# Developers
+The resulting `mpd.exe` is at `output/win64/mpd.exe`.
 
-- [Protocol specification](https://mpd.readthedocs.io/en/latest/protocol.html)
-- [Developer manual](https://mpd.readthedocs.io/en/latest/developer.html)
-
-# Legal
-
-MPD is released under the
-[GNU General Public License version 2](https://www.gnu.org/licenses/gpl-2.0.txt),
-which is distributed in the COPYING file.
