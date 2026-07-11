@@ -62,4 +62,4 @@ for x in thirdparty_libs:
 
 from build.meson import configure as run_meson
 run_meson(toolchain, mpd_path, '.', configure_args)
-subprocess.check_call(['/usr/bin/ninja'], env=toolchain.env)
+subprocess.check_call(['/usr/bin/ninja', '-j4'], env=toolchain.env)
