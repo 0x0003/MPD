@@ -33,7 +33,7 @@ Index: ffmpeg-8.1.2/libavformat/id3v2.c
 -    } else if (!(strcmp(key, "TXXX") && strcmp(key, "TXX"))) {
 -        /* dst now contains the key, need to get value */
 -        key = dst;
-+    while (taglen > 1) {
++    while (taglen > 0) {
          if (decode_str(s, pb, encoding, &dst, &taglen) < 0) {
              av_log(s, AV_LOG_ERROR, "Error reading frame %s, skipped\n", key);
 -            av_freep(&key);
