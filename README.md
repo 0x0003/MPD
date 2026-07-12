@@ -1,8 +1,11 @@
-## Original README [**HERE**](https://github.com/MusicPlayerDaemon/MPD)
+## [**Original README here**](https://github.com/MusicPlayerDaemon/MPD)
 
-A personal fork that fixes a few Windows-specific issues in MPD:
+A personal fork that fixes a few Windows-specific quirks in MPD:
+- Compiles with FLAC support that's been missing from official binaries since 0.24.8 [#2536](https://github.com/MusicPlayerDaemon/MPD/issues/2536)
 - Bumps libid3tag from 0.15.1b to 0.16.4
 - Fixes multi-value ID3v2.4 tags, e.g. multiple genres, not being read correctly due to ffmpeg's incomplete id3v2 parser (https://trac.ffmpeg.org/ticket/6949). Why does upstream MPD code properly process tags on Linux, but Windows requires a workaround? I have no idea.
+- Gracefully handles process shutdown without losing state file.
+- wasapi output fixes: [#1408](https://github.com/MusicPlayerDaemon/MPD/issues/1408) [#1880](https://github.com/MusicPlayerDaemon/MPD/issues/1880)
 
 ## Building
 
