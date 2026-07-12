@@ -88,5 +88,8 @@ ScanFileTagsWithGeneric(Path path, TagBuilder &builder,
 
 	ScanGenericTags(path, h);
 
+	if (builder.empty())
+		ScanFileTagsNoGeneric(path, h);
+
 	return !builder.empty();
 }
