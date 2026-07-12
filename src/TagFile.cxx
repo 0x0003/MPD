@@ -82,10 +82,11 @@ ScanFileTagsWithGeneric(Path path, TagBuilder &builder,
 {
 	FullTagHandler h(builder, audio_format);
 
-	ScanGenericTags(path, h);
+	ScanFileTagsNoGeneric(path, h);
 
-	if (builder.empty())
-		ScanFileTagsNoGeneric(path, h);
+	builder.RemoveAll();
+
+	ScanGenericTags(path, h);
 
 	return !builder.empty();
 }
