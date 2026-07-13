@@ -28,6 +28,7 @@
 #include "system/Error.hxx"
 #include "util/StringCompare.hxx"
 #include "util/UriExtract.hxx"
+#include "time/ChronoUtil.hxx"
 
 #include <cassert>
 #include <cstring>
@@ -143,7 +144,7 @@ LoadPlaylistFileInfo(PlaylistInfo &info,
 		return false;
 	}
 
-	info.mtime = fi.GetModificationTime();
+	info.mtime = TruncateToSeconds(fi.GetModificationTime());
 	return true;
 }
 
