@@ -29,6 +29,7 @@
 #include "util/Domain.hxx"
 #include "util/RecursiveMap.hxx"
 #include "Log.hxx"
+#include "time/ChronoUtil.hxx"
 
 #ifdef ENABLE_ZLIB
 #include "lib/zlib/GzipOutputStream.hxx"
@@ -143,7 +144,7 @@ SimpleDatabase::Load()
 
 	FileInfo fi;
 	if (GetFileInfo(path, fi))
-		mtime = fi.GetModificationTime();
+		mtime = TruncateToSeconds(fi.GetModificationTime());
 }
 
 void
@@ -373,7 +374,7 @@ SimpleDatabase::Save()
 
 	FileInfo fi;
 	if (GetFileInfo(path, fi))
-		mtime = fi.GetModificationTime();
+		mtime = TruncateToSeconds(fi.GetModificationTime());
 }
 
 void

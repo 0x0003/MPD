@@ -11,6 +11,7 @@
 #include "fs/AllocatedPath.hxx"
 #include "fs/DirectoryReader.hxx"
 #include "util/StringCompare.hxx"
+#include "time/ChronoUtil.hxx"
 
 #include <string>
 
@@ -72,7 +73,7 @@ Stat(Path path, bool follow)
 		info.type = StorageFileInfo::Type::OTHER;
 
 	info.size = src.GetSize();
-	info.mtime = src.GetModificationTime();
+	info.mtime = TruncateToSeconds(src.GetModificationTime());
 #ifdef _WIN32
 	info.device = info.inode = 0;
 #else

@@ -68,12 +68,7 @@ public:
 	[[gnu::pure]]
 	std::chrono::system_clock::time_point GetModificationTime() const noexcept {
 #ifdef _WIN32
-		/* truncate to seconds to match what the database stores
-		   via to_time_t(); FILETIME has 100ns precision but the
-		   DB round-trips through time_t which is seconds-only */
-		return std::chrono::system_clock::from_time_t(
-			std::chrono::system_clock::to_time_t(
-				FileTimeToChrono(data.ftLastWriteTime)));
+		return FileTimeToChrono(data.ftLastWriteTime);
 #else
 		return std::chrono::system_clock::from_time_t(st.st_mtime);
 #endif
