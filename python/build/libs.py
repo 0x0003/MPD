@@ -560,7 +560,6 @@ ffmpeg = FfmpegProject(
         '--disable-bsf=vp9_superframe',
         '--disable-bsf=vp9_superframe_split',
     ],
-    patches='src/lib/ffmpeg/patches',
 )
 
 libmpg123 = AutotoolsProject(
