@@ -1,12 +1,15 @@
 ## [**Original README here**](https://github.com/MusicPlayerDaemon/MPD)
 
 A personal fork that fixes a few Windows-specific quirks:
+
+> crossed out items have been merged upstream
+
 - Compiles with FLAC support that's been missing from official binaries since 0.24.8 [#2536](https://github.com/MusicPlayerDaemon/MPD/issues/2536)
-- ~Compiles with mpg123, so MP3 files' tags are parsed using libid3tag instead, avoiding an ancient ffmpeg bug where id3v2.4 multi-value tags are truncated (https://trac.ffmpeg.org/ticket/6949)~ merged upstream
+- ~Compiles with mpg123, so MP3 files' tags are parsed using libid3tag instead, avoiding an ancient ffmpeg bug where id3v2.4 multi-value tags are truncated (https://trac.ffmpeg.org/ticket/6949)~
 - Bumps libid3tag from 0.15.1b to 0.16.4
-- Gracefully handles process shutdown without losing state file.
+- ~Gracefully handles process shutdown without losing state file.~
 - wasapi output: fixes [#1408](https://github.com/MusicPlayerDaemon/MPD/issues/1408), [#1880](https://github.com/MusicPlayerDaemon/MPD/issues/1880), audio pops on seek/play/pause.
-- Properly handles database updates between restarts, not forcing full rescan due to mtime mismatch.
+- ~Properly handles database updates between restarts, not forcing full rescan due to mtime mismatch.~
 
 ## Building
 
