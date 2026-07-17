@@ -7,6 +7,7 @@
 #include "ForMixer.hxx"
 #include "AudioClient.hxx"
 #include "Device.hxx"
+#include "DeviceNotification.hxx"
 #include "PropertyStore.hxx"
 #include "output/OutputAPI.hxx"
 #include "lib/icu/Win32.hxx"
@@ -152,6 +153,7 @@ class WasapiOutputThread {
 	const UINT32 frame_size;
 	const UINT32 buffer_size_in_frames;
 	const bool is_exclusive;
+	HANDLE device_event;
 
 	/**
 	 * This flag is only used by the calling thread
@@ -184,10 +186,11 @@ public:
 	WasapiOutputThread(IAudioClient &_client,
 			   ComPtr<IAudioRenderClient> &&_render_client,
 			   const UINT32 _frame_size, const UINT32 _buffer_size_in_frames,
-			   bool _is_exclusive)
+			   bool _is_exclusive, HANDLE _device_event)
 		:client(_client),
 		 render_client(std::move(_render_client)), frame_size(_frame_size),
 		 buffer_size_in_frames(_buffer_size_in_frames), is_exclusive(_is_exclusive),
+		 device_event(_device_event),
 		 ring_buffer(_buffer_size_in_frames * 4 * _frame_size)
 	{
 		SetEventHandle(client, event.handle());
@@ -304,12 +307,17 @@ class WasapiOutput final : public AudioOutput {
 	const std::string device_config;
 
 	std::shared_ptr<COMWorker> com_worker;
+	ComPtr<IMMDeviceEnumerator> device_enumerator;
 	ComPtr<IMMDevice> device;
 	ComPtr<IAudioClient> client;
 	WAVEFORMATEXTENSIBLE device_format;
 	std::optional<WasapiOutputThread> thread;
 	std::size_t watermark;
 	std::optional<PcmExport> pcm_export;
+
+	/* Device change notification state (see DeviceNotification.hxx) */
+	WinEvent device_event;
+	ComPtr<IMMNotificationClient> notification;
 
 public:
 	static AudioOutput *Create(EventLoop &, const ConfigBlock &block);
@@ -324,14 +332,33 @@ public:
 		com_worker = std::make_shared<COMWorker>();
 
 		try {
-			com_worker->Async([&]() { ChooseDevice(); }).get();
+			com_worker->Async([&]() {
+				ChooseDevice();
+
+				device_enumerator.CoCreateInstance(
+					__uuidof(MMDeviceEnumerator),
+					nullptr, CLSCTX_INPROC_SERVER);
+			if (device_enumerator) {
+				notification = ComPtr<IMMNotificationClient>(
+					new WasapiDeviceNotification(device_event.handle(),
+								      !device_config.empty()));
+				device_enumerator->RegisterEndpointNotificationCallback(notification.get());
+				}
+			}).get();
 		} catch (...) {
 			com_worker.reset();
 			throw;
 		}
 	}
 	void Disable() noexcept override {
-		com_worker->Async([&]() { DoDisable(); }).get();
+		com_worker->Async([&]() {
+			if (notification && device_enumerator) {
+				device_enumerator->UnregisterEndpointNotificationCallback(notification.get());
+				notification.reset();
+			}
+			device_enumerator.reset();
+			DoDisable();
+		}).get();
 		com_worker.reset();
 	}
 	void Open(AudioFormat &audio_format) override {
@@ -419,7 +446,14 @@ try {
 	};
 
 	while (true) {
-		event.Wait();
+		HANDLE handles[2] = { event.handle(), device_event };
+		DWORD result = WaitForMultipleObjects(2, handles, FALSE, INFINITE);
+
+		if (result == WAIT_OBJECT_0 + 1) {
+			/* Audio device changed; the output framework
+			   will reopen on the new device. */
+			throw AudioDeviceChanged{};
+		}
 
 		if (cancel.load()) {
 			ring_buffer.Discard();
@@ -531,10 +565,13 @@ WasapiOutput::DoOpen(AudioFormat &audio_format)
 {
 	client.reset();
 
-	if (GetState(*device) != DEVICE_STATE_ACTIVE) {
-		device.reset();
-		ChooseDevice();
-	}
+	/* Always re-enumerate because the auto-reset device_event
+	   is consumed by the worker thread's
+	   WaitForMultipleObjects before DoOpen gets a chance to
+	   check it. */
+	device.reset();
+	ChooseDevice();
+	ResetEvent(device_event.handle());
 
 	client = Activate<IAudioClient>(*device);
 
@@ -657,7 +694,8 @@ WasapiOutput::DoOpen(AudioFormat &audio_format)
 
 	watermark = buffer_size_in_frames * 3 * FrameSize();
 	thread.emplace(*client, std::move(render_client), FrameSize(),
-		       buffer_size_in_frames, is_exclusive);
+		       buffer_size_in_frames, is_exclusive,
+		       device_event.handle());
 
 	paused = false;
 }
