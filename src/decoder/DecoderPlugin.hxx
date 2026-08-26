@@ -39,6 +39,9 @@ struct DecoderPlugin {
 	 * Return a set of supported filename suffixes.  Use this
 	 * instead of #suffixes if the supported suffixes can only be
 	 * determined at runtime.
+	 *
+	 * The strings must be lower case; they are matched
+	 * case-insensitively.
 	 */
 	std::set<std::string, std::less<>> (*suffixes_function)() noexcept = nullptr;
 

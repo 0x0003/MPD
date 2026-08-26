@@ -20,6 +20,15 @@ StringArrayContainsCase(const char *const*haystack,
 	return false;
 }
 
+std::string
+ToLowerCaseASCII(std::string_view src)
+{
+	std::string dest{src};
+	for (auto &i : dest)
+		i = ToLowerASCII(i);
+	return dest;
+}
+
 void
 ToUpperASCII(char *dest, const char *src, size_t size) noexcept
 {

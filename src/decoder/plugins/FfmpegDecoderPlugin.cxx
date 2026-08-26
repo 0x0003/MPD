@@ -30,6 +30,7 @@
 #include "util/ScopeExit.hxx"
 #include "util/StringAPI.hxx"
 #include "util/StringCompare.hxx"
+#include "util/StringUtil.hxx"
 #include "Log.hxx"
 
 extern "C" {
@@ -716,7 +717,7 @@ ffmpeg_suffixes() noexcept
 	while (const auto input_format = av_demuxer_iterate(&demuxer_opaque)) {
 		if (input_format->extensions != nullptr) {
 			for (const auto i : IterableSplitString(input_format->extensions, ','))
-				suffixes.emplace(i);
+				suffixes.emplace(ToLowerCaseASCII(i));
 		} else {
 			if (StringIsEqual(input_format->name, "aiff"))
 				/* the "aiff" demuxer has no extension

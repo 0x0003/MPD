@@ -20,6 +20,7 @@
 #include "util/DynamicFifoBuffer.hxx"
 #include "util/ScopeExit.hxx"
 #include "util/StringCompare.hxx"
+#include "util/StringUtil.hxx"
 
 extern "C" {
 #include <vgmstream/libvgmstream.h>
@@ -324,7 +325,7 @@ VgmstreamSuffixes() noexcept
 	const char **extensions = libvgmstream_get_extensions(&size);
 
 	for (int i = 0; i < size; i++)
-		suffixes.emplace(extensions[i]);
+		suffixes.emplace(ToLowerCaseASCII(extensions[i]));
 
 	return suffixes;
 }

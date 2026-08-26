@@ -22,14 +22,19 @@ DecoderPlugin::SupportsUri(const std::string_view uri) const noexcept
 
 [[gnu::pure]]
 static bool
-SetContains(const auto &set, const auto &key) noexcept
+SetContains(const auto &set, std::string_view key) noexcept
 {
+	/* the sets contain only lower-case suffixes; fold the key so
+	   matching is case-insensitive, like the static suffix lists
+	   ("*.MP3" must be handled like "*.mp3") */
+	const std::string lower = ToLowerCaseASCII(key);
+
 #ifdef ANDROID
 	/* the libc++ version in Android NDK r25c doesn't implement
-	   std::set::contains() */ 
-	return set.find(key) != set.end();
+	   std::set::contains() */
+	return set.find(lower) != set.end();
 #else
-	return set.contains(key);
+	return set.contains(lower);
 #endif
 }
 

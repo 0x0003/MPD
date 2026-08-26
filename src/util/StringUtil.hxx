@@ -5,6 +5,7 @@
 #define STRING_UTIL_HXX
 
 #include <cstddef>
+#include <string>
 #include <string_view>
 
 /**
@@ -27,5 +28,14 @@ StringArrayContainsCase(const char *const*haystack,
  */
 void
 ToUpperASCII(char *dest, const char *src, size_t size) noexcept;
+
+/**
+ * Convert the specified ASCII string (0x00..0x7f) to lower case.
+ *
+ * Unlike tolower(), it ignores the system locale.
+ */
+[[gnu::pure]]
+std::string
+ToLowerCaseASCII(std::string_view src);
 
 #endif
